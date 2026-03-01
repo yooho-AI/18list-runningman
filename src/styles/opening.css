@@ -1,0 +1,418 @@
+/* ── Running Man：传奇赛季 · 开场样式 ── */
+/* 综艺节目开场：摄影棚灯光 + LOGO动画 + 成员登场 + 角色选择 + 姓名输入 */
+
+/* ── Phase 1: 摄影棚灯光 + LOGO ── */
+
+.rm-start {
+  position: fixed;
+  inset: 0;
+  background: #090c10;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.rm-spotlight-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(255, 184, 0, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 80%, rgba(255, 184, 0, 0.06) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 70%, rgba(255, 184, 0, 0.08) 0%, transparent 45%),
+    linear-gradient(180deg, #0d1117 0%, #090c10 100%);
+}
+
+/* 舞台灯光扫射 */
+.rm-spotlight-sweep {
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  width: 200px;
+  height: 150%;
+  background: linear-gradient(90deg, transparent, rgba(255, 184, 0, 0.04), transparent);
+  transform: translateX(-50%) rotate(15deg);
+  animation: rmSweep 4s ease-in-out infinite alternate;
+}
+
+@keyframes rmSweep {
+  from { transform: translateX(-300px) rotate(15deg); }
+  to { transform: translateX(300px) rotate(-15deg); }
+}
+
+/* 星光粒子 */
+.rm-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #FFB800;
+  border-radius: 50%;
+  opacity: 0;
+  animation: rmParticle 3s ease-in-out infinite;
+}
+
+@keyframes rmParticle {
+  0% { opacity: 0; transform: translateY(0) scale(0); }
+  50% { opacity: 0.8; transform: translateY(-30px) scale(1); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.5); }
+}
+
+/* LOGO 区域 */
+.rm-logo-area {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.rm-logo-icon {
+  font-size: 72px;
+  margin-bottom: 16px;
+  animation: rmLogoBounce 2s ease-in-out infinite;
+}
+
+@keyframes rmLogoBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.rm-logo-title {
+  font-size: 42px;
+  font-weight: 900;
+  color: #FFB800;
+  letter-spacing: 8px;
+  text-shadow:
+    0 0 20px rgba(255, 184, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+  margin-bottom: 8px;
+}
+
+.rm-logo-subtitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 6px;
+  margin-bottom: 40px;
+}
+
+.rm-logo-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 280px;
+  line-height: 1.8;
+  margin-bottom: 48px;
+}
+
+/* CTA 按钮 */
+.rm-start-btn {
+  position: relative;
+  padding: 14px 48px;
+  background: linear-gradient(135deg, #FFB800, #FF9500);
+  color: #0d1117;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow:
+    0 0 20px rgba(255, 184, 0, 0.3),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rm-start-btn:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 30px rgba(255, 184, 0, 0.4),
+    0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.rm-start-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: rmBtnShimmer 2.5s infinite;
+}
+
+@keyframes rmBtnShimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+.rm-continue-btn {
+  margin-top: 16px;
+  padding: 10px 32px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 13px;
+  letter-spacing: 2px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rm-continue-btn:hover {
+  color: #FFB800;
+  border-color: rgba(255, 184, 0, 0.4);
+}
+
+/* ── Phase 2: 成员闪切 ── */
+
+.rm-montage {
+  position: fixed;
+  inset: 0;
+  background: #090c10;
+  overflow: hidden;
+  z-index: 51;
+}
+
+.rm-montage-portrait {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rm-montage-portrait img {
+  width: 75%;
+  max-width: 320px;
+  height: 70vh;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: 16px;
+  box-shadow: 0 0 40px rgba(255, 184, 0, 0.15);
+}
+
+.rm-montage-name {
+  position: absolute;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-weight: 800;
+  color: #FFB800;
+  letter-spacing: 6px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.rm-montage-title {
+  position: absolute;
+  bottom: 11%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  color: var(--text-secondary);
+  letter-spacing: 3px;
+}
+
+/* ── Phase 3: 角色选择 + 姓名输入 ── */
+
+.rm-setup {
+  position: fixed;
+  inset: 0;
+  background: #090c10;
+  overflow-y: auto;
+  z-index: 52;
+}
+
+.rm-setup-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 24px 40px;
+  min-height: 100%;
+}
+
+.rm-setup-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFB800;
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+}
+
+.rm-setup-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin-bottom: 32px;
+}
+
+/* 角色类型卡片 */
+.rm-role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 360px;
+  margin-bottom: 32px;
+}
+
+.rm-role-card {
+  padding: 16px 12px;
+  background: rgba(255, 184, 0, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rm-role-card:hover {
+  border-color: rgba(255, 184, 0, 0.4);
+  background: rgba(255, 184, 0, 0.08);
+}
+
+.rm-role-card.active {
+  border-color: #FFB800;
+  background: rgba(255, 184, 0, 0.12);
+  box-shadow: 0 0 12px rgba(255, 184, 0, 0.15);
+}
+
+.rm-role-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.rm-role-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.rm-role-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* 属性预览 */
+.rm-role-stats {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.rm-role-stat-pill {
+  padding: 2px 6px;
+  font-size: 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+}
+
+/* 姓名输入 */
+.rm-name-section {
+  width: 100%;
+  max-width: 300px;
+  text-align: center;
+}
+
+.rm-name-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.rm-name-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255, 184, 0, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 16px;
+  text-align: center;
+  letter-spacing: 2px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.rm-name-input:focus {
+  border-color: #FFB800;
+  box-shadow: 0 0 8px rgba(255, 184, 0, 0.15);
+}
+
+.rm-name-input::placeholder {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.rm-go-btn {
+  margin-top: 24px;
+  padding: 12px 40px;
+  background: linear-gradient(135deg, #FFB800, #FF9500);
+  color: #0d1117;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(255, 184, 0, 0.25);
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.rm-go-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.rm-go-btn:not(:disabled):hover {
+  transform: scale(1.05);
+}
+
+/* 跳过按钮 */
+.rm-skip-btn {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  right: 16px;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 60;
+  transition: color 0.2s;
+}
+
+.rm-skip-btn:hover {
+  color: var(--text-secondary);
+}
+
+/* 音乐提示栏 */
+.rm-music-bar {
+  position: absolute;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px 20px;
+  background: rgba(255, 184, 0, 0.08);
+  border: 1px solid rgba(255, 184, 0, 0.2);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.rm-music-bar:hover {
+  background: rgba(255, 184, 0, 0.12);
+}
