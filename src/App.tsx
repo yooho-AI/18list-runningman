@@ -10,6 +10,9 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useGameStore, ENDINGS, ROLE_TYPES, STORY_INFO } from './lib/store'
 import { trackGameStart, trackGameContinue, trackPlayerCreate } from './lib/analytics'
 import AppShell from './components/game/app-shell'
+import './styles/globals.css'
+import './styles/opening.css'
+import './styles/rich-cards.css'
 
 const P = 'rm'
 
