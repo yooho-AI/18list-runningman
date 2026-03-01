@@ -8,8 +8,9 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGameStore, ENDINGS } from './lib/store'
-import { trackGameContinue } from './lib/analytics'
+import { trackGameStart, trackGameContinue, trackPlayerCreate } from './lib/analytics'
 import CoverPage from './components/opening/CoverPage'
+import ProloguePage from './components/opening/ProloguePage'
 import AppShell from './components/game/app-shell'
 import './styles/globals.css'
 import './styles/cover.css'
@@ -21,17 +22,31 @@ const P = 'rm'
 // ── OpeningScreen: Cover → Prologue ──
 
 function OpeningScreen() {
-  const { loadGame, hasSave } = useGameStore()
+  const { initGame, setPlayerInfo, loadGame, hasSave } = useGameStore()
+  const [phase, setPhase] = useState<'cover' | 'prologue'>('cover')
+
+  if (phase === 'cover') {
+    return (
+      <CoverPage
+        hasSave={hasSave()}
+        onNewGame={() => {
+          setPhase('prologue')
+        }}
+        onContinue={() => {
+          trackGameContinue()
+          loadGame()
+        }}
+      />
+    )
+  }
 
   return (
-    <CoverPage
-      hasSave={hasSave()}
-      onNewGame={() => {
-        window.open('https://yooho.ai/login', '_blank')
-      }}
-      onContinue={() => {
-        trackGameContinue()
-        loadGame()
+    <ProloguePage
+      onComplete={(name, opts) => {
+        trackGameStart()
+        trackPlayerCreate(name, opts?.role ?? '')
+        setPlayerInfo(name, opts?.role ?? 'power')
+        initGame()
       }}
     />
   )
