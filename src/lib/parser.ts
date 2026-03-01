@@ -52,10 +52,10 @@ function colorizeStats(line: string): string {
 
 function colorizeCharNames(html: string): string {
   let result = html
-  for (const [name, color] of Object.entries(CHARACTER_COLORS)) {
+  for (const name of Object.keys(CHARACTER_COLORS)) {
     result = result.replaceAll(
       name,
-      `<span class="char-name" style="color:${color};font-weight:600">${name}</span>`,
+      `<span class="char-name">${name}</span>`,
     )
   }
   return result

@@ -624,7 +624,7 @@ body {
 }
 
 /* ── Rich text helpers ── */
-.char-name { font-weight: 600; margin-right: 4px; }
+.char-name { font-weight: 600; color: var(--primary); }
 .stat-changes { margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(var(--primary-rgb), 0.15); font-size: 12px; }
 .stat-change { font-weight: 600; margin-right: 8px; }
 .stat-up { color: var(--success); }

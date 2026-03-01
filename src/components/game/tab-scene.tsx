@@ -1,24 +1,22 @@
 /**
- * [INPUT]: store.ts (useGameStore, SCENES, getAvailableCharacters)
- * [OUTPUT]: TabScene — 场景Tab：9:16大图 + 人物标签 + 地点列表
- * [POS]: 场景展示面板。当前场景大图 + 相关角色 + 所有地点网格
+ * [INPUT]: store.ts (useGameStore, SCENES)
+ * [OUTPUT]: TabScene — 场景Tab：9:16大图 + 地点列表
+ * [POS]: 场景展示面板。当前场景大图 + 所有地点网格（角色列表只在人物Tab）
  * [PROTOCOL]: Update this header on change, then check CLAUDE.md
  */
 
 import {
-  useGameStore, SCENES, getAvailableCharacters,
+  useGameStore, SCENES,
 } from '../../lib/store'
 
 const P = 'rm'
 
 export default function TabScene() {
   const {
-    currentScene, currentEpisode, characters, unlockedScenes,
-    selectScene, selectCharacter, setActiveTab,
+    currentScene, unlockedScenes, selectScene,
   } = useGameStore()
 
   const scene = SCENES[currentScene]
-  const available = getAvailableCharacters(currentEpisode, characters)
   const scenes = Object.values(SCENES)
 
   return (
@@ -54,33 +52,8 @@ export default function TabScene() {
         </div>
       )}
 
-      {/* Related Characters */}
-      <div style={{ padding: '16px' }}>
-        <div className={`${P}-stat-group`}>👥 成员</div>
-        <div className={`${P}-char-grid`} style={{ padding: 0 }}>
-          {Object.entries(available).map(([id, char]) => (
-            <button
-              key={id}
-              className={`${P}-char-tag`}
-              onClick={() => {
-                selectCharacter(id)
-                setActiveTab('character')
-              }}
-            >
-              <img src={char.portrait} alt={char.name} />
-              <div className={`${P}-char-tag-info`}>
-                <div className={`${P}-char-tag-name`} style={{ color: char.themeColor }}>
-                  {char.name}
-                </div>
-                <div className={`${P}-char-tag-title`}>{char.title}</div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* All Locations */}
-      <div style={{ padding: '0 16px 24px' }}>
+      <div style={{ padding: '16px 16px 24px' }}>
         <div className={`${P}-stat-group`}>📍 所有场景</div>
         <div className={`${P}-char-grid`} style={{ padding: 0 }}>
           {scenes.map((s) => {
