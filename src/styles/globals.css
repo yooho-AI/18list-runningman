@@ -458,6 +458,24 @@ body {
   text-align: center;
 }
 
+.rm-ending-restart {
+  padding: 10px 32px;
+  background: linear-gradient(135deg, #FFB800, #FF9500);
+  color: #0d1117;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  border: none;
+  border-radius: 24px;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 184, 0, 0.2);
+  transition: transform 0.2s;
+}
+
+.rm-ending-restart:hover {
+  transform: scale(1.05);
+}
+
 /* ── Toast ── */
 .rm-toast {
   position: fixed;

@@ -1,9 +1,15 @@
-/* ── Running Man：传奇赛季 · 开场样式 ── */
-/* 综艺节目开场：摄影棚灯光 + LOGO动画 + 成员登场 + 角色选择 + 姓名输入 */
+/**
+ * [INPUT]: 无外部依赖
+ * [OUTPUT]: 序幕三阶段全部样式
+ * [POS]: Running Man 暗金竞技风序幕 — 聚光灯 + 成员闪切 + 角色选择
+ * [PROTOCOL]: ★ 种子文件 — 匹配 Running Man 暗金主题
+ */
 
-/* ── Phase 1: 摄影棚灯光 + LOGO ── */
+/* ================================================================
+   Phase 1: 聚光灯 + Logo
+   ================================================================ */
 
-.rm-start {
+.rm-spotlight {
   position: fixed;
   inset: 0;
   background: #090c10;
@@ -21,7 +27,6 @@
     linear-gradient(180deg, #0d1117 0%, #090c10 100%);
 }
 
-/* 舞台灯光扫射 */
 .rm-spotlight-sweep {
   position: absolute;
   top: -20%;
@@ -38,7 +43,6 @@
   to { transform: translateX(300px) rotate(-15deg); }
 }
 
-/* 星光粒子 */
 .rm-particle {
   position: absolute;
   width: 3px;
@@ -55,8 +59,7 @@
   100% { opacity: 0; transform: translateY(-60px) scale(0.5); }
 }
 
-/* LOGO 区域 */
-.rm-logo-area {
+.rm-spotlight-content {
   position: relative;
   z-index: 2;
   display: flex;
@@ -68,7 +71,7 @@
   text-align: center;
 }
 
-.rm-logo-icon {
+.rm-spotlight-icon {
   font-size: 72px;
   margin-bottom: 16px;
   animation: rmLogoBounce 2s ease-in-out infinite;
@@ -79,7 +82,7 @@
   50% { transform: translateY(-10px); }
 }
 
-.rm-logo-title {
+.rm-spotlight-title {
   font-size: 42px;
   font-weight: 900;
   color: #FFB800;
@@ -90,7 +93,7 @@
   margin-bottom: 8px;
 }
 
-.rm-logo-subtitle {
+.rm-spotlight-subtitle {
   font-size: 16px;
   font-weight: 600;
   color: var(--text-secondary);
@@ -98,7 +101,7 @@
   margin-bottom: 40px;
 }
 
-.rm-logo-desc {
+.rm-spotlight-desc {
   font-size: 13px;
   color: var(--text-muted);
   max-width: 280px;
@@ -106,8 +109,7 @@
   margin-bottom: 48px;
 }
 
-/* CTA 按钮 */
-.rm-start-btn {
+.rm-spotlight-cta {
   position: relative;
   padding: 14px 48px;
   background: linear-gradient(135deg, #FFB800, #FF9500);
@@ -125,14 +127,14 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.rm-start-btn:hover {
+.rm-spotlight-cta:hover {
   transform: scale(1.05);
   box-shadow:
     0 0 30px rgba(255, 184, 0, 0.4),
     0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-.rm-start-btn::before {
+.rm-spotlight-cta::before {
   content: '';
   position: absolute;
   top: 0;
@@ -148,25 +150,9 @@
   100% { left: 200%; }
 }
 
-.rm-continue-btn {
-  margin-top: 16px;
-  padding: 10px 32px;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 13px;
-  letter-spacing: 2px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.rm-continue-btn:hover {
-  color: #FFB800;
-  border-color: rgba(255, 184, 0, 0.4);
-}
-
-/* ── Phase 2: 成员闪切 ── */
+/* ================================================================
+   Phase 2: 成员蒙太奇闪切
+   ================================================================ */
 
 .rm-montage {
   position: fixed;
@@ -176,47 +162,99 @@
   z-index: 51;
 }
 
-.rm-montage-portrait {
+.rm-montage-slide {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.rm-montage-portrait img {
-  width: 75%;
-  max-width: 320px;
-  height: 70vh;
+.rm-montage-portrait {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: top center;
-  border-radius: 16px;
-  box-shadow: 0 0 40px rgba(255, 184, 0, 0.15);
+}
+
+.rm-montage-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 40%,
+    rgba(9, 12, 16, 0.6) 70%,
+    rgba(9, 12, 16, 0.95) 100%
+  );
+}
+
+.rm-montage-info {
+  position: absolute;
+  bottom: 18%;
+  left: 0;
+  right: 0;
+  text-align: center;
 }
 
 .rm-montage-name {
-  position: absolute;
-  bottom: 15%;
-  left: 50%;
-  transform: translateX(-50%);
   font-size: 28px;
   font-weight: 800;
   color: #FFB800;
   letter-spacing: 6px;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  margin-bottom: 8px;
 }
 
 .rm-montage-title {
-  position: absolute;
-  bottom: 11%;
-  left: 50%;
-  transform: translateX(-50%);
   font-size: 14px;
   color: var(--text-secondary);
   letter-spacing: 3px;
 }
 
-/* ── Phase 3: 角色选择 + 姓名输入 ── */
+/* 蒙太奇进度点 */
+.rm-montage-dots {
+  position: absolute;
+  bottom: calc(32px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 55;
+}
+
+.rm-montage-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+}
+
+.rm-montage-dot.active {
+  background: #FFB800;
+  box-shadow: 0 0 6px rgba(255, 184, 0, 0.4);
+}
+
+/* 跳过按钮 */
+.rm-skip-btn {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  right: 16px;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  z-index: 60;
+  transition: color 0.2s;
+}
+
+.rm-skip-btn:hover {
+  color: var(--text-secondary);
+}
+
+/* ================================================================
+   Phase 3: 角色选择 + 姓名输入
+   ================================================================ */
 
 .rm-setup {
   position: fixed;
@@ -224,14 +262,27 @@
   background: #090c10;
   overflow-y: auto;
   z-index: 52;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
 }
 
 .rm-setup-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 60px 24px 40px;
+  padding: 48px 24px 40px;
   min-height: 100%;
+}
+
+.rm-setup-badge {
+  padding: 4px 16px;
+  background: rgba(255, 184, 0, 0.08);
+  border: 1px solid rgba(255, 184, 0, 0.2);
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #FFB800;
+  letter-spacing: 4px;
+  margin-bottom: 20px;
 }
 
 .rm-setup-title {
@@ -249,7 +300,7 @@
   margin-bottom: 32px;
 }
 
-/* 角色类型卡片 */
+/* 角色类型卡片 2×2 */
 .rm-role-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -298,7 +349,6 @@
   line-height: 1.5;
 }
 
-/* 属性预览 */
 .rm-role-stats {
   display: flex;
   gap: 6px;
@@ -375,44 +425,4 @@
 
 .rm-go-btn:not(:disabled):hover {
   transform: scale(1.05);
-}
-
-/* 跳过按钮 */
-.rm-skip-btn {
-  position: absolute;
-  top: calc(16px + env(safe-area-inset-top));
-  right: 16px;
-  padding: 6px 16px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 16px;
-  color: var(--text-muted);
-  font-size: 12px;
-  cursor: pointer;
-  z-index: 60;
-  transition: color 0.2s;
-}
-
-.rm-skip-btn:hover {
-  color: var(--text-secondary);
-}
-
-/* 音乐提示栏 */
-.rm-music-bar {
-  position: absolute;
-  bottom: calc(24px + env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 8px 20px;
-  background: rgba(255, 184, 0, 0.08);
-  border: 1px solid rgba(255, 184, 0, 0.2);
-  border-radius: 20px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.rm-music-bar:hover {
-  background: rgba(255, 184, 0, 0.12);
 }

@@ -1,178 +1,54 @@
 /**
- * [INPUT]: store.ts (useGameStore), analytics.ts (trackGameStart/Continue/PlayerCreate)
- * [OUTPUT]: 根组件：三阶段开场 + GameScreen + EndingModal + MenuOverlay
- * [POS]: React 根组件，唯一挂载点。三阶段开场(摄影棚灯光→成员闪切→角色选择+姓名输入)
+ * [INPUT]: store.ts (useGameStore), analytics.ts, CoverPage, ProloguePage
+ * [OUTPUT]: 根组件：封面 → 序幕 → 正片 + EndingModal + MenuOverlay
+ * [POS]: React 根组件，唯一挂载点。流程：Cover → Prologue(聚光灯→闪切→角色选择) → Main Game
  * [PROTOCOL]: Update this header on change, then check CLAUDE.md
  */
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useGameStore, ENDINGS, ROLE_TYPES, STORY_INFO } from './lib/store'
+import { useGameStore, ENDINGS } from './lib/store'
 import { trackGameStart, trackGameContinue, trackPlayerCreate } from './lib/analytics'
+import CoverPage from './components/opening/CoverPage'
+import ProloguePage from './components/opening/ProloguePage'
 import AppShell from './components/game/app-shell'
 import './styles/globals.css'
-import './styles/opening.css'
+import './styles/cover.css'
+import './styles/prologue.css'
 import './styles/rich-cards.css'
 
 const P = 'rm'
 
-// ── Characters for montage ──
+// ── OpeningScreen: Cover → Prologue ──
 
-const MONTAGE_MEMBERS = [
-  { name: '刘在石', title: '国民MC', portrait: '/characters/jaesuk.jpg' },
-  { name: '金钟国', title: '能力者', portrait: '/characters/jongkook.jpg' },
-  { name: 'HAHA', title: '氛围担当', portrait: '/characters/haha.jpg' },
-  { name: '宋智孝', title: 'ACE', portrait: '/characters/jihyo.jpg' },
-  { name: '李光洙', title: '亚洲王子', portrait: '/characters/kwangsoo.jpg' },
-  { name: '池石镇', title: '大哥', portrait: '/characters/sukjin.jpg' },
-  { name: '全昭旻', title: '综艺小魔女', portrait: '/characters/somin.jpg' },
-  { name: '梁世灿', title: '综艺陀螺', portrait: '/characters/sechan.jpg' },
-]
-
-// ── StartScreen: 3-phase opening ──
-
-function StartScreen() {
+function OpeningScreen() {
   const { initGame, setPlayerInfo, loadGame, hasSave } = useGameStore()
-  const saved = hasSave()
-  const [phase, setPhase] = useState<'logo' | 'montage' | 'setup'>('logo')
-  const [montageIndex, setMontageIndex] = useState(0)
-  const [selectedRole, setSelectedRole] = useState('')
-  const [playerName, setPlayerName] = useState('')
+  const [phase, setPhase] = useState<'cover' | 'prologue'>('cover')
 
-  // Montage: cycle through members
-  useEffect(() => {
-    if (phase !== 'montage') return
-    if (montageIndex >= MONTAGE_MEMBERS.length) {
-      setPhase('setup')
-      return
-    }
-    const timer = setTimeout(() => setMontageIndex((i) => i + 1), 1800)
-    return () => clearTimeout(timer)
-  }, [phase, montageIndex])
-
-  const handleStart = useCallback(() => {
-    trackGameStart()
-    setPhase('montage')
-  }, [])
-
-  const handleContinue = useCallback(() => {
-    trackGameContinue()
-    loadGame()
-  }, [loadGame])
-
-  const handleGo = useCallback(() => {
-    if (!playerName.trim() || !selectedRole) return
-    setPlayerInfo(playerName.trim(), selectedRole)
-    trackPlayerCreate(playerName.trim(), selectedRole)
-    initGame()
-  }, [playerName, selectedRole, setPlayerInfo, initGame])
-
-  // ── Phase 1: Logo + Spotlight ──
-  if (phase === 'logo') {
+  if (phase === 'cover') {
     return (
-      <div className={`${P}-start`}>
-        <div className="rm-spotlight-bg" />
-        <div className="rm-spotlight-sweep" />
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="rm-particle" style={{
-            left: `${10 + Math.random() * 80}%`,
-            top: `${20 + Math.random() * 60}%`,
-            animationDelay: `${Math.random() * 3}s`,
-          }} />
-        ))}
-        <div className="rm-logo-area">
-          <div className="rm-logo-icon">🏃</div>
-          <div className="rm-logo-title">{STORY_INFO.title}</div>
-          <div className="rm-logo-subtitle">{STORY_INFO.subtitle}</div>
-          <div className="rm-logo-desc">
-            风靡亚洲的真人竞技综艺，15期终极生存挑战！与刘在石、金钟国等传奇成员一起奔跑吧！
-          </div>
-          <button className="rm-start-btn" onClick={handleStart}>
-            开 始 录 制
-          </button>
-          {saved && (
-            <button className="rm-continue-btn" onClick={handleContinue}>
-              继续上次录制
-            </button>
-          )}
-        </div>
-      </div>
+      <CoverPage
+        hasSave={hasSave()}
+        onNewGame={() => {
+          setPhase('prologue')
+        }}
+        onContinue={() => {
+          trackGameContinue()
+          loadGame()
+        }}
+      />
     )
   }
 
-  // ── Phase 2: Member Montage ──
-  if (phase === 'montage') {
-    const member = MONTAGE_MEMBERS[montageIndex]
-    if (!member) return null
-    return (
-      <div className="rm-montage">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={montageIndex}
-            className="rm-montage-portrait"
-            initial={{ opacity: 0, x: montageIndex % 2 === 0 ? -60 : 60 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: montageIndex % 2 === 0 ? 60 : -60 }}
-            transition={{ duration: 0.4 }}
-          >
-            <img src={member.portrait} alt={member.name} />
-            <div className="rm-montage-name">{member.name}</div>
-            <div className="rm-montage-title">{member.title}</div>
-          </motion.div>
-        </AnimatePresence>
-        <button className="rm-skip-btn" onClick={() => setPhase('setup')}>
-          跳过 ▸
-        </button>
-      </div>
-    )
-  }
-
-  // ── Phase 3: Role Selection + Name Input ──
   return (
-    <div className="rm-setup">
-      <div className="rm-setup-inner">
-        <div className="rm-setup-title">选择你的类型</div>
-        <div className="rm-setup-subtitle">决定你的初始属性分配</div>
-
-        <div className="rm-role-grid">
-          {ROLE_TYPES.map((role) => (
-            <button
-              key={role.id}
-              className={`rm-role-card ${selectedRole === role.id ? 'active' : ''}`}
-              onClick={() => setSelectedRole(role.id)}
-            >
-              <div className="rm-role-icon">{role.icon}</div>
-              <div className="rm-role-name">{role.name}</div>
-              <div className="rm-role-desc">{role.description}</div>
-              <div className="rm-role-stats">
-                <span className="rm-role-stat-pill">💪{role.initialStats.stamina}</span>
-                <span className="rm-role-stat-pill">🧠{role.initialStats.iq}</span>
-                <span className="rm-role-stat-pill">🎭{role.initialStats.variety}</span>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        <div className="rm-name-section">
-          <div className="rm-name-label">你的艺名</div>
-          <input
-            className="rm-name-input"
-            placeholder="输入你的名字"
-            value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
-            maxLength={10}
-          />
-        </div>
-
-        <button
-          className="rm-go-btn"
-          disabled={!playerName.trim() || !selectedRole}
-          onClick={handleGo}
-        >
-          开始录制 ▸
-        </button>
-      </div>
-    </div>
+    <ProloguePage
+      onComplete={(name, opts) => {
+        trackGameStart()
+        trackPlayerCreate(name, opts?.role ?? '')
+        setPlayerInfo(name, opts?.role ?? 'power')
+        initGame()
+      }}
+    />
   )
 }
 
@@ -233,8 +109,7 @@ function EndingModal() {
             {ending.description}
           </p>
           <button
-            className="rm-start-btn"
-            style={{ fontSize: 14, padding: '10px 32px' }}
+            className={`${P}-ending-restart`}
             onClick={() => { clearSave(); resetGame() }}
           >
             重新开始
@@ -314,7 +189,7 @@ export default function App() {
   const { gameStarted } = useGameStore()
   const [menuOpen, setMenuOpen] = useState(false)
 
-  if (!gameStarted) return <StartScreen />
+  if (!gameStarted) return <OpeningScreen />
 
   return (
     <>
