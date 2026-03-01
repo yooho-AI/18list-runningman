@@ -9,6 +9,7 @@ import GAME_SCRIPT from './script.md?raw'
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
 import { streamChat, chat } from './stream'
+import { extractChoices } from './parser'
 import {
   type Character, type CharacterStats, type Message, type StatMeta,
   type StoryRecord,
@@ -52,6 +53,7 @@ interface GameState {
   historySummary: string
   isTyping: boolean
   streamingContent: string
+  choices: string[]
 
   endingType: string | null
 
@@ -247,6 +249,7 @@ export const useGameStore = create<GameStore>()(immer((set, get) => ({
   historySummary: '',
   isTyping: false,
   streamingContent: '',
+  choices: [],
 
   endingType: null,
 
@@ -294,6 +297,7 @@ export const useGameStore = create<GameStore>()(immer((set, get) => ({
       s.currentChapter = 1
       s.endingType = null
       s.betrayalCount = 0
+      s.choices = ['挑战对决', '结盟合作', '搞笑整活', '暗中观察']
     })
   },
 
@@ -455,13 +459,28 @@ export const useGameStore = create<GameStore>()(immer((set, get) => ({
         set((s) => { s.endingType = 'be-enemy' })
       }
 
-      // Push AI message
+      // Extract choices from AI response
+      const { cleanContent, choices } = extractChoices(fullContent)
+
+      // Fallback: if AI didn't return choices, generate context-aware ones
+      const finalChoices = choices.length >= 2 ? choices : (() => {
+        const char = get().currentCharacter
+          ? get().characters[get().currentCharacter!]
+          : null
+        if (char) {
+          return [`继续和${char.name}互动`, '挑战对决', '结盟合作', '暗中观察']
+        }
+        return ['挑战对决', '结盟合作', '搞笑整活', '暗中观察']
+      })()
+
+      // Push AI message (with clean content, choices stored separately)
       set((s) => {
         s.messages.push({
-          id: makeId(), role: 'assistant', content: fullContent,
+          id: makeId(), role: 'assistant', content: cleanContent || fullContent,
           character: s.currentCharacter ?? undefined,
           timestamp: Date.now(),
         })
+        s.choices = finalChoices.slice(0, 4)
         s.isTyping = false
         s.streamingContent = ''
       })
@@ -695,6 +714,7 @@ export const useGameStore = create<GameStore>()(immer((set, get) => ({
       s.historySummary = ''
       s.isTyping = false
       s.streamingContent = ''
+      s.choices = []
       s.endingType = null
       s.activeTab = 'dialogue'
       s.showDashboard = false

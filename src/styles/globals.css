@@ -158,7 +158,7 @@ body {
   position: relative;
   transition: color 0.2s;
 }
-.rm-tab-item span:first-child { font-size: 20px; }
+.rm-tab-item svg { font-size: 20px; }
 
 .rm-tab-active { color: var(--primary); }
 .rm-tab-active::after {
@@ -221,43 +221,49 @@ body {
 .rm-bubble-system::before { left: -6px; transform: rotate(180deg); }
 .rm-bubble-system::after { right: -6px; }
 
-/* ── Quick Actions ── */
-.rm-quick-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+/* ── Dynamic Choices (4x1 vertical) ── */
+.rm-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   padding: 8px 16px;
 }
 
-.rm-quick-btn {
-  padding: 10px 12px;
-  background: rgba(var(--primary-rgb), 0.06);
+.rm-choice-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(var(--primary-rgb), 0.05);
   border: 1px solid rgba(var(--primary-rgb), 0.15);
   border-radius: 12px;
   color: var(--text-primary);
   font-size: 13px;
+  line-height: 1.4;
   cursor: pointer;
+  text-align: left;
   transition: all 0.2s;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
 }
-.rm-quick-btn::after {
-  content: '';
-  position: absolute;
-  top: -50%; left: -75%;
-  width: 50%; height: 200%;
-  background: linear-gradient(90deg, transparent, rgba(var(--primary-rgb), 0.08), transparent);
-  transform: skewX(-25deg);
-  animation: rmShimmer 3s ease-in-out infinite;
-}
-.rm-quick-btn:hover {
+.rm-choice-btn:hover {
   background: rgba(var(--primary-rgb), 0.12);
   border-color: rgba(var(--primary-rgb), 0.3);
 }
-.rm-quick-btn:active { transform: scale(0.97); }
-.rm-quick-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.rm-quick-btn:disabled::after { display: none; }
+.rm-choice-btn:active { transform: scale(0.98); }
+.rm-choice-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.rm-choice-idx {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(var(--primary-rgb), 0.12);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
 /* ── Input Area ── */
 .rm-input-area {
@@ -318,6 +324,31 @@ body {
   font-size: 16px;
   cursor: pointer;
   flex-shrink: 0;
+  position: relative;
+}
+
+.rm-inventory-btn-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--primary);
+  color: #0d1117;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rm-inventory-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.5);
 }
 
 /* ── Scene Hero ── */
@@ -571,11 +602,29 @@ body {
 .rm-menu-btn:hover { background: rgba(var(--primary-rgb), 0.12); }
 .rm-menu-btn.danger { color: var(--danger); border-color: rgba(220, 38, 38, 0.2); }
 
+/* ── Markdown rendering in NPC bubbles ── */
+.rm-bubble-npc p { margin: 0 0 8px; }
+.rm-bubble-npc p:last-child { margin-bottom: 0; }
+.rm-bubble-npc strong { color: var(--primary); font-weight: 700; }
+.rm-bubble-npc em { color: var(--text-secondary); font-style: italic; }
+.rm-bubble-npc blockquote {
+  border-left: 2px solid rgba(var(--primary-rgb), 0.3);
+  margin: 8px 0;
+  padding: 4px 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+.rm-bubble-npc ul, .rm-bubble-npc ol { margin: 6px 0; padding-left: 20px; }
+.rm-bubble-npc li { margin-bottom: 4px; }
+.rm-bubble-npc hr {
+  border: none;
+  height: 1px;
+  background: rgba(var(--primary-rgb), 0.15);
+  margin: 10px 0;
+}
+
 /* ── Rich text helpers ── */
-.dialogue-line { margin: 4px 0; }
 .char-name { font-weight: 600; margin-right: 4px; }
-.action { color: var(--text-secondary); font-style: italic; margin: 4px 0; }
-.narration { margin: 4px 0; line-height: 1.8; }
 .stat-changes { margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(var(--primary-rgb), 0.15); font-size: 12px; }
 .stat-change { font-weight: 600; margin-right: 8px; }
 .stat-up { color: var(--success); }

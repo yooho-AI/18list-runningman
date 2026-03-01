@@ -9,6 +9,11 @@ import { useRef, useState, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useGameStore, PERIODS, getCurrentChapter } from '../../lib/store'
 import { useBgm } from '../../lib/bgm'
+import {
+  MapTrifold, ChatCircleDots, Users,
+  Notebook, Scroll, MusicNotes, SpeakerSimpleSlash,
+  List,
+} from '@phosphor-icons/react'
 import DashboardDrawer from './dashboard-drawer'
 import TabDialogue from './tab-dialogue'
 import TabScene from './tab-scene'
@@ -17,16 +22,16 @@ import TabCharacter from './tab-character'
 const P = 'rm'
 
 const TAB_CONFIG = [
-  { key: 'scene' as const, icon: '🗺️', label: '场景' },
-  { key: 'dialogue' as const, icon: '💬', label: '对话' },
-  { key: 'character' as const, icon: '👤', label: '人物' },
+  { key: 'scene' as const, Icon: MapTrifold, label: '场景' },
+  { key: 'dialogue' as const, Icon: ChatCircleDots, label: '对话' },
+  { key: 'character' as const, Icon: Users, label: '人物' },
 ]
 
 function BgmToggle() {
   const { isPlaying, toggle } = useBgm()
   return (
     <button className={`${P}-header-btn`} onClick={(e) => toggle(e)}>
-      {isPlaying ? '🔊' : '🔇'}
+      {isPlaying ? <MusicNotes size={18} weight="fill" /> : <SpeakerSimpleSlash size={18} />}
     </button>
   )
 }
@@ -49,7 +54,7 @@ function RecordSheet({ onClose }: { onClose: () => void }) {
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className={`${P}-record-header`}>📜 事件记录</div>
+        <div className={`${P}-record-header`}><Scroll size={16} weight="fill" /> 事件记录</div>
         <div className={`${P}-record-timeline`}>
           {[...storyRecords].reverse().map((rec) => (
             <div key={rec.id} className={`${P}-record-item`}>
@@ -107,7 +112,7 @@ export default function AppShell({ onMenuOpen }: { onMenuOpen: () => void }) {
       {/* Header */}
       <header className={`${P}-header`}>
         <div className={`${P}-header-left`}>
-          <button className={`${P}-header-btn`} onClick={toggleDashboard}>📓</button>
+          <button className={`${P}-header-btn`} onClick={toggleDashboard}><Notebook size={18} /></button>
           <span className={`${P}-header-time`}>
             {period?.icon} 第{currentEpisode}期 · {period?.name}
           </span>
@@ -117,8 +122,8 @@ export default function AppShell({ onMenuOpen }: { onMenuOpen: () => void }) {
         </div>
         <div className={`${P}-header-right`}>
           <BgmToggle />
-          <button className={`${P}-header-btn`} onClick={onMenuOpen}>☰</button>
-          <button className={`${P}-header-btn`} onClick={toggleRecords}>📜</button>
+          <button className={`${P}-header-btn`} onClick={onMenuOpen}><List size={18} /></button>
+          <button className={`${P}-header-btn`} onClick={toggleRecords}><Scroll size={18} /></button>
         </div>
       </header>
 
@@ -152,7 +157,7 @@ export default function AppShell({ onMenuOpen }: { onMenuOpen: () => void }) {
             className={`${P}-tab-item ${activeTab === tab.key ? `${P}-tab-active` : ''}`}
             onClick={() => setActiveTab(tab.key)}
           >
-            <span>{tab.icon}</span>
+            <tab.Icon size={20} weight={activeTab === tab.key ? 'fill' : 'regular'} />
             <span>{tab.label}</span>
           </button>
         ))}

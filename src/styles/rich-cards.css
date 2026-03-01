@@ -701,6 +701,10 @@
 .rm-inventory-item:hover {
   background: rgba(255, 184, 0, 0.1);
 }
+.rm-inventory-item.empty {
+  opacity: 0.35;
+  cursor: default;
+}
 
 .rm-inventory-icon {
   font-size: 24px;
