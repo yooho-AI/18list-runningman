@@ -25,7 +25,9 @@ const TAB_CONFIG = [
   { key: 'scene' as const, Icon: MapTrifold, label: '场景' },
   { key: 'dialogue' as const, Icon: ChatCircleDots, label: '对话' },
   { key: 'character' as const, Icon: Users, label: '人物' },
-]
+] as const
+
+type TabKey = typeof TAB_CONFIG[number]['key']
 
 function BgmToggle() {
   const { isPlaying, toggle } = useBgm()
@@ -112,7 +114,6 @@ export default function AppShell({ onMenuOpen }: { onMenuOpen: () => void }) {
       {/* Header */}
       <header className={`${P}-header`}>
         <div className={`${P}-header-left`}>
-          <button className={`${P}-header-btn`} onClick={toggleDashboard}><Notebook size={18} /></button>
           <span className={`${P}-header-time`}>
             {period?.icon} 第{currentEpisode}期 · {period?.name}
           </span>
@@ -123,7 +124,6 @@ export default function AppShell({ onMenuOpen }: { onMenuOpen: () => void }) {
         <div className={`${P}-header-right`}>
           <BgmToggle />
           <button className={`${P}-header-btn`} onClick={onMenuOpen}><List size={18} /></button>
-          <button className={`${P}-header-btn`} onClick={toggleRecords}><Scroll size={18} /></button>
         </div>
       </header>
 
@@ -151,16 +151,30 @@ export default function AppShell({ onMenuOpen }: { onMenuOpen: () => void }) {
 
       {/* Tab Bar */}
       <nav className={`${P}-tab-bar`}>
+        <button
+          className={`${P}-tab-item`}
+          onClick={toggleDashboard}
+        >
+          <Notebook size={20} />
+          <span>手册</span>
+        </button>
         {TAB_CONFIG.map((tab) => (
           <button
             key={tab.key}
-            className={`${P}-tab-item ${activeTab === tab.key ? `${P}-tab-active` : ''}`}
+            className={`${P}-tab-item ${activeTab === (tab.key as TabKey) ? `${P}-tab-active` : ''}`}
             onClick={() => setActiveTab(tab.key)}
           >
-            <tab.Icon size={20} weight={activeTab === tab.key ? 'fill' : 'regular'} />
+            <tab.Icon size={20} weight={activeTab === (tab.key as TabKey) ? 'fill' : 'regular'} />
             <span>{tab.label}</span>
           </button>
         ))}
+        <button
+          className={`${P}-tab-item`}
+          onClick={toggleRecords}
+        >
+          <Scroll size={20} />
+          <span>事件</span>
+        </button>
       </nav>
 
       {/* Dashboard Drawer */}
