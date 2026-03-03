@@ -1,7 +1,7 @@
 /**
- * [INPUT]: store.ts (useGameStore, GLOBAL_STAT_METAS, getAvailableCharacters, getTrustLevel)
- * [OUTPUT]: TabCharacter — 人物Tab：立绘+属性+关系图+角色网格+全屏档案
- * [POS]: 人物展示面板。PortraitHero + StatBars + RelationGraph + CharacterGrid + Dossier
+ * [INPUT]: store.ts (useGameStore, getAvailableCharacters, getTrustLevel)
+ * [OUTPUT]: TabCharacter -- 2x2角色网格(聊天按钮+mini信任条) + SVG关系图 + CharacterDossier overlay+sheet + CharacterChat
+ * [POS]: 人物展示面板。角色网格 + RelationGraph + Dossier + Chat
  * [PROTOCOL]: Update this header on change, then check CLAUDE.md
  */
 
@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChatCircleDots } from '@phosphor-icons/react'
 import {
-  useGameStore, GLOBAL_STAT_METAS,
+  useGameStore,
   getAvailableCharacters, getTrustLevel,
   type Character, type StatMeta,
 } from '../../lib/store'
@@ -160,7 +160,7 @@ function RelationGraph({ onNodeClick }: { onNodeClick: (id: string) => void }) {
   )
 }
 
-// ── Character Dossier ──
+// ── Character Dossier (overlay + sheet) ──
 
 function CharacterDossier({
   char, stats, onClose,
@@ -174,101 +174,112 @@ function CharacterDossier({
   const trustInfo = getTrustLevel(trust)
 
   return (
-    <motion.div
-      className={`${P}-dossier-overlay`}
-      initial={{ x: '100%' }}
-      animate={{ x: 0 }}
-      exit={{ x: '100%' }}
-      transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-    >
-      <button className={`${P}-dossier-close`} onClick={onClose}>✕</button>
-      <div className={`${P}-dossier-seal`}>【成员档案】</div>
+    <>
+      <motion.div
+        className={`${P}-dossier-overlay`}
+        style={{ background: 'rgba(0,0,0,0.5)', overflow: 'visible' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+      />
+      <motion.div
+        className={`${P}-record-sheet`}
+        style={{ zIndex: 52, overflowY: 'auto' }}
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+      >
+        <button className={`${P}-dossier-close`} onClick={onClose}>✕</button>
+        <div className={`${P}-dossier-seal`}>【成员档案】</div>
 
-      <div className={`${P}-dossier-portrait`}>
-        <motion.img
-          src={char.portrait}
-          alt={char.name}
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <div className={`${P}-dossier-portrait-fade`} />
-      </div>
-
-      <div className={`${P}-dossier-content ${P}-scrollbar`}>
-        <h2 className={`${P}-dossier-name`} style={{ color: char.themeColor }}>
-          {char.name}
-        </h2>
-        <p className={`${P}-dossier-title-text`}>
-          {char.title} · {char.description}
-        </p>
-
-        <div className={`${P}-dossier-tags`}>
-          <span className={`${P}-dossier-tag`}>{char.gender === 'male' ? '男' : '女'}</span>
-          <span className={`${P}-dossier-tag`}>{char.age}岁</span>
-          <span className={`${P}-dossier-tag`}>{char.title}</span>
-          <span className={`${P}-dossier-tag`} style={{ color: trustInfo.color }}>
-            {trustInfo.icon} {trustInfo.label}
-          </span>
+        <div className={`${P}-dossier-portrait`}>
+          <motion.img
+            src={char.portrait}
+            alt={char.name}
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          <div className={`${P}-dossier-portrait-fade`} />
         </div>
 
-        {/* Trust bar */}
-        <div className={`${P}-dossier-section`}>
-          <div className={`${P}-dossier-section-title`}>信任度</div>
-          {char.statMetas.map((meta, i) => (
-            <StatBar
-              key={meta.key}
-              meta={meta}
-              value={stats[meta.key] ?? 0}
-              delay={i * 0.1}
-            />
-          ))}
-        </div>
-
-        {/* Personality */}
-        <div className={`${P}-dossier-section`}>
-          <div className={`${P}-dossier-section-title`}>性格特征</div>
-          <p style={{ fontSize: 13, lineHeight: 1.8, color: 'var(--text-secondary)' }}>
-            {expanded ? char.personality : char.personality.slice(0, 50)}
-            {char.personality.length > 50 && (
-              <button
-                onClick={() => setExpanded(!expanded)}
-                style={{
-                  background: 'none', border: 'none',
-                  color: '#FFB800', cursor: 'pointer',
-                  fontSize: 12, marginLeft: 4,
-                }}
-              >
-                {expanded ? '收起' : '...展开'}
-              </button>
-            )}
+        <div className={`${P}-dossier-content ${P}-scrollbar`}>
+          <h2 className={`${P}-dossier-name`} style={{ color: char.themeColor }}>
+            {char.name}
+          </h2>
+          <p className={`${P}-dossier-title-text`}>
+            {char.title} · {char.description}
           </p>
-        </div>
 
-        {/* Speaking style */}
-        <div className={`${P}-dossier-section`}>
-          <div className={`${P}-dossier-section-title`}>说话风格</div>
-          <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8, fontStyle: 'italic' }}>
-            "{char.speakingStyle}"
-          </p>
-        </div>
+          <div className={`${P}-dossier-tags`}>
+            <span className={`${P}-dossier-tag`}>{char.gender === 'male' ? '男' : '女'}</span>
+            <span className={`${P}-dossier-tag`}>{char.age}岁</span>
+            <span className={`${P}-dossier-tag`}>{char.title}</span>
+            <span className={`${P}-dossier-tag`} style={{ color: trustInfo.color }}>
+              {trustInfo.icon} {trustInfo.label}
+            </span>
+          </div>
 
-        {/* Trigger hints */}
-        <div className={`${P}-dossier-section`}>
-          <div className={`${P}-dossier-section-title`}>触发暗示</div>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {char.triggerPoints.map((tp, i) => (
-              <span
-                key={i}
-                className={`${P}-dossier-tag`}
-                style={{ fontSize: 10 }}
-              >
-                {tp.slice(0, 8)}...
-              </span>
+          {/* Trust bar */}
+          <div className={`${P}-dossier-section`}>
+            <div className={`${P}-dossier-section-title`}>信任度</div>
+            {char.statMetas.map((meta, i) => (
+              <StatBar
+                key={meta.key}
+                meta={meta}
+                value={stats[meta.key] ?? 0}
+                delay={i * 0.1}
+              />
             ))}
           </div>
+
+          {/* Personality */}
+          <div className={`${P}-dossier-section`}>
+            <div className={`${P}-dossier-section-title`}>性格特征</div>
+            <p style={{ fontSize: 13, lineHeight: 1.8, color: 'var(--text-secondary)' }}>
+              {expanded ? char.personality : char.personality.slice(0, 50)}
+              {char.personality.length > 50 && (
+                <button
+                  onClick={() => setExpanded(!expanded)}
+                  style={{
+                    background: 'none', border: 'none',
+                    color: '#FFB800', cursor: 'pointer',
+                    fontSize: 12, marginLeft: 4,
+                  }}
+                >
+                  {expanded ? '收起' : '...展开'}
+                </button>
+              )}
+            </p>
+          </div>
+
+          {/* Speaking style */}
+          <div className={`${P}-dossier-section`}>
+            <div className={`${P}-dossier-section-title`}>说话风格</div>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.8, fontStyle: 'italic' }}>
+              "{char.speakingStyle}"
+            </p>
+          </div>
+
+          {/* Trigger hints */}
+          <div className={`${P}-dossier-section`}>
+            <div className={`${P}-dossier-section-title`}>触发暗示</div>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              {char.triggerPoints.map((tp, i) => (
+                <span
+                  key={i}
+                  className={`${P}-dossier-tag`}
+                  style={{ fontSize: 10 }}
+                >
+                  {tp.slice(0, 8)}...
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+    </>
   )
 }
 
@@ -276,145 +287,101 @@ function CharacterDossier({
 
 export default function TabCharacter() {
   const {
-    characters, characterStats, currentCharacter, currentEpisode, globalStats,
+    characters, characterStats, currentCharacter, currentEpisode,
     selectCharacter,
   } = useGameStore()
 
   const [dossierId, setDossierId] = useState<string | null>(null)
   const [chatChar, setChatChar] = useState<string | null>(null)
   const available = getAvailableCharacters(currentEpisode, characters)
-  const currentChar = currentCharacter ? characters[currentCharacter] : null
-  const currentStats = currentCharacter ? characterStats[currentCharacter] : null
+
+  const handleCharClick = (id: string) => {
+    selectCharacter(id)
+    setDossierId(id)
+  }
 
   return (
-    <div className={`${P}-scrollbar`} style={{ height: '100%', overflowY: 'auto' }}>
-      {/* Portrait Hero */}
-      {currentChar && (
-        <div
-          className={`${P}-portrait-hero`}
-          onClick={() => setDossierId(currentChar.id)}
-          style={{ cursor: 'pointer' }}
-        >
-          <img src={currentChar.portrait} alt={currentChar.name} />
-          <div style={{
-            position: 'absolute', bottom: 0, left: 0, right: 0,
-            padding: '24px 16px 12px',
-            background: 'linear-gradient(transparent, rgba(13, 17, 23, 0.95))',
-          }}>
-            <div style={{
-              fontSize: 22, fontWeight: 800,
-              color: currentChar.themeColor,
-            }}>
-              {currentChar.name}
-            </div>
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 2 }}>
-              {currentChar.title} · {currentChar.description}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!currentChar && (
-        <div style={{
-          padding: '40px 16px', textAlign: 'center',
-          color: 'var(--text-muted)', fontSize: 14,
-        }}>
-          选择一位成员查看详情
-        </div>
-      )}
-
-      {/* Global Stats */}
-      <div style={{ padding: '8px 0' }}>
-        <div className={`${P}-stat-group`}>📊 个人属性</div>
-        {GLOBAL_STAT_METAS.map((meta, i) => (
-          <StatBar
-            key={meta.key}
-            meta={meta}
-            value={globalStats[meta.key as keyof typeof globalStats] ?? 0}
-            delay={i * 0.1}
-          />
-        ))}
-      </div>
-
-      {/* Current character trust */}
-      {currentChar && currentStats && (
-        <div style={{ padding: '0' }}>
-          <div className={`${P}-stat-group`}>🤝 与{currentChar.name}的关系</div>
-          {currentChar.statMetas.map((meta, i) => (
-            <StatBar
-              key={meta.key}
-              meta={meta}
-              value={currentStats[meta.key] ?? 0}
-              delay={i * 0.1}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Relation Graph */}
-      <div style={{ padding: '8px 16px' }}>
-        <div className={`${P}-stat-group`} style={{ padding: 0 }}>🕸️ 关系网络</div>
-        <RelationGraph onNodeClick={(id) => {
-          selectCharacter(id)
-          setDossierId(id)
-        }} />
-      </div>
-
-      {/* Relation Cards */}
-      <div style={{ padding: '0 16px' }}>
-        <div className={`${P}-stat-group`} style={{ padding: 0 }}>👥 全部成员</div>
+    <div className={`${P}-scrollbar`} style={{ height: '100%', overflowY: 'auto', padding: 12 }}>
+      {/* ── 角色网格 (2x2) ── */}
+      <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8, paddingLeft: 4 }}>
+        👥 全部成员
+      </h4>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
         {Object.entries(available).map(([id, char]) => {
-          const stats = characterStats[id]
-          const trust = stats?.trust ?? 0
+          const stats = characterStats[id] ?? {}
+          const trust = stats.trust ?? 0
           const trustInfo = getTrustLevel(trust)
+          const pct = Math.max(0, Math.min(100, (trust + 100) / 2))
           return (
-            <div
+            <button
               key={id}
-              className={`${P}-relation-card`}
-              style={{ position: 'relative' }}
-              onClick={() => {
-                selectCharacter(id)
-                setDossierId(id)
+              onClick={() => handleCharClick(id)}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                padding: 10, borderRadius: 12,
+                background: currentCharacter === id ? `${char.themeColor}15` : 'var(--bg-card)',
+                border: `1px solid ${currentCharacter === id ? char.themeColor + '44' : 'rgba(255,184,0,0.1)'}`,
+                cursor: 'pointer', transition: 'all 0.2s',
+                position: 'relative',
               }}
             >
-              <button
-                className={`${P}-icon-btn`}
+              {/* 聊天按钮 */}
+              <div
+                onClick={(e) => { e.stopPropagation(); setChatChar(id) }}
                 style={{
-                  position: 'absolute',
-                  top: 6,
-                  left: 6,
-                  width: 28,
-                  height: 28,
-                  zIndex: 2,
-                }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setChatChar(id)
+                  position: 'absolute', top: 6, left: 6,
+                  width: 28, height: 28, borderRadius: '50%',
+                  background: `${char.themeColor}18`,
+                  border: `1px solid ${char.themeColor}30`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  cursor: 'pointer', zIndex: 1,
                 }}
               >
-                <ChatCircleDots size={16} weight="fill" />
-              </button>
+                <ChatCircleDots size={16} weight="fill" color={char.themeColor} />
+              </div>
               <img
-                className={`${P}-relation-avatar`}
                 src={char.portrait}
                 alt={char.name}
-                style={{ borderColor: char.themeColor }}
+                style={{
+                  width: 56, height: 56, borderRadius: '50%',
+                  objectFit: 'cover', objectPosition: 'center top',
+                  border: `2px solid ${char.themeColor}44`,
+                  marginBottom: 6,
+                }}
               />
-              <div className={`${P}-relation-info`}>
-                <div className={`${P}-relation-name`} style={{ color: char.themeColor }}>
-                  {char.name}
-                </div>
-                <div className={`${P}-relation-label`}>{char.title}</div>
+              <span style={{ fontSize: 12, fontWeight: 500, color: char.themeColor }}>
+                {char.name}
+              </span>
+              <span style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 4 }}>
+                {char.title}
+              </span>
+              {/* Mini trust bar */}
+              <div style={{ width: '80%', height: 3, borderRadius: 2, background: 'rgba(255,184,0,0.1)' }}>
+                <div style={{
+                  height: '100%', borderRadius: 2, background: trustInfo.color,
+                  width: `${pct}%`, transition: 'width 0.5s ease',
+                }} />
               </div>
-              <div className={`${P}-relation-value`} style={{ color: trustInfo.color }}>
-                {trustInfo.icon} {trust}
-              </div>
-            </div>
+              <span style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2 }}>
+                {trustInfo.icon} {trustInfo.label} {trust}
+              </span>
+            </button>
           )
         })}
       </div>
 
-      <div style={{ height: 24 }} />
+      {/* ── 关系图 ── */}
+      <h4 style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8, paddingLeft: 4 }}>
+        🕸️ 关系网络
+      </h4>
+      <div style={{
+        padding: 12, borderRadius: 16, background: 'var(--bg-card)',
+        border: '1px solid rgba(255,184,0,0.1)', marginBottom: 20,
+      }}>
+        <RelationGraph onNodeClick={handleCharClick} />
+      </div>
+
+      <div style={{ height: 16 }} />
 
       {/* Character Dossier */}
       <AnimatePresence>
