@@ -22,7 +22,7 @@ const P = 'rm'
 // ── OpeningScreen: Cover → Prologue ──
 
 function OpeningScreen() {
-  const { initGame, setPlayerInfo, loadGame, hasSave } = useGameStore()
+  const { initGame, setPlayerInfo, loadGame, hasSave, sendMessage } = useGameStore()
   const [phase, setPhase] = useState<'cover' | 'prologue'>('cover')
 
   if (phase === 'cover') {
@@ -47,6 +47,8 @@ function OpeningScreen() {
         trackPlayerCreate(name, opts?.role ?? '')
         setPlayerInfo(name, opts?.role ?? 'power')
         initGame()
+        // 自动发送第一条消息触发 AI 开场
+        setTimeout(() => sendMessage('开始游戏'), 500)
       }}
     />
   )

@@ -7,11 +7,13 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { ChatCircleDots } from '@phosphor-icons/react'
 import {
   useGameStore, GLOBAL_STAT_METAS,
   getAvailableCharacters, getTrustLevel,
   type Character, type StatMeta,
 } from '../../lib/store'
+import CharacterChat from './character-chat'
 
 const P = 'rm'
 
@@ -279,6 +281,7 @@ export default function TabCharacter() {
   } = useGameStore()
 
   const [dossierId, setDossierId] = useState<string | null>(null)
+  const [chatChar, setChatChar] = useState<string | null>(null)
   const available = getAvailableCharacters(currentEpisode, characters)
   const currentChar = currentCharacter ? characters[currentCharacter] : null
   const currentStats = currentCharacter ? characterStats[currentCharacter] : null
@@ -368,11 +371,29 @@ export default function TabCharacter() {
             <div
               key={id}
               className={`${P}-relation-card`}
+              style={{ position: 'relative' }}
               onClick={() => {
                 selectCharacter(id)
                 setDossierId(id)
               }}
             >
+              <button
+                className={`${P}-icon-btn`}
+                style={{
+                  position: 'absolute',
+                  top: 6,
+                  left: 6,
+                  width: 28,
+                  height: 28,
+                  zIndex: 2,
+                }}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setChatChar(id)
+                }}
+              >
+                <ChatCircleDots size={16} weight="fill" />
+              </button>
               <img
                 className={`${P}-relation-avatar`}
                 src={char.portrait}
@@ -402,6 +423,16 @@ export default function TabCharacter() {
             char={characters[dossierId]}
             stats={characterStats[dossierId] ?? {}}
             onClose={() => setDossierId(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Character Chat */}
+      <AnimatePresence>
+        {chatChar && characters[chatChar] && (
+          <CharacterChat
+            charId={chatChar}
+            onClose={() => setChatChar(null)}
           />
         )}
       </AnimatePresence>
